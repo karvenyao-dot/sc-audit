@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sc-audit"
+version = "0.8.4"
+description = "Detection-floor and control-composition audit for case-control single-cell studies"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Yuanqing Yao", email = "karvenyao@163.com"}]
+keywords = ["single-cell", "reproducibility", "audit", "detection floor", "confounding"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+    "numpy>=1.21",
+    "pandas>=1.4",
+    "scipy>=1.8",
+    "anndata>=0.9",
+    "scanpy>=1.9",
+    "matplotlib>=3.5",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-cov"]
+
+[project.scripts]
+sc-audit = "sc_audit.cli:main"
+
+[project.urls]
+Repository = "https://github.com/karvenyao-dot/sc-audit"
+
+[tool.setuptools]
+packages = ["sc_audit"]
+
+[tool.setuptools.package-data]
+sc_audit = ["configs/*.yaml"]

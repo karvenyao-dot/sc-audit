@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "sc-audit: an operational audit framework for low-expression genes in case-control single-cell studies"
+message: "If you use this software, please cite it as below."
+type: software
+license: MIT
+version: 0.8.4
+date-released: 2026-10-12
+abstract: >-
+  Detection-floor, control-composition (including an identifiability layer with a
+  prespecified matching ladder), robust-signal and cell-identity audits for
+  case-control single-cell/single-nucleus studies, with all thresholds fixed
+  before analysis.
+authors:
+  - family-names: "Yao"
+    given-names: "Yuanqing"
+    orcid: "https://orcid.org/0000-0002-2301-8209"
+    affiliation: "The Second Affiliated Hospital of Chongqing Medical University"
+repository-code: "https://github.com/karvenyao-dot/sc-audit"
+keywords:
+  - single-cell
+  - reproducibility
+  - confounding
+  - detection floor
+  - identifiability

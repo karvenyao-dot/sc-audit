@@ -1,0 +1,78 @@
+==========================================================================
+sc-audit readiness check（预检 · 只报告，不采纳）
+==========================================================================
+
+【输入】
+  细胞 300 · 基因 22
+  计数来源: X
+  基因名: 符号（直接可用）   缺失 0 个
+
+【分组与供者】
+  条件水平: ['control', 'disease']
+  case 口径: single level
+  对照 'control': 150 细胞 / 6 供者
+  病例 'disease': 150 细胞 / 6 供者
+
+【候选设计变量（按建议优先级排序；本命令不会自动采用）】
+  变量                角色            水平    供者级TVD      V     熵   建议
+  institution       取材/来源          2     0.833  0.845  0.98   可用·需注意
+  donation_type     取材/来源          2     0.833  0.845  0.98   可用·需注意
+  source            取材/来源          2     0.833  0.845  0.98   可用·需注意
+
+  · [可用·需注意] institution：供者级 TVD=0.833 > hetero_max=0.5：与分组接近分离 → 若纳入并命中，判定将直接指向 NOT SEPARABLE。匹配它会在控制来源差异的同时抹掉真实的病例/对照差异（把生物学一起匹配走）
+  · [可用·需注意] donation_type：供者级 TVD=0.833 > hetero_max=0.5：与分组接近分离 → 若纳入并命中，判定将直接指向 NOT SEPARABLE。匹配它会在控制来源差异的同时抹掉真实的病例/对照差异（把生物学一起匹配走）
+  · [可用·需注意] source：供者级 TVD=0.833 > hetero_max=0.5：与分组接近分离 → 若纳入并命中，判定将直接指向 NOT SEPARABLE。匹配它会在控制来源差异的同时抹掉真实的病例/对照差异（把生物学一起匹配走）
+
+【三项审计可行性】
+  ✅ audit_1_floor        可运行
+       - 未提供 --reference → R 无法计算，多数基因将判 INSUFFICIENT (no reference)
+  ⚠️ audit_2_composition  可运行，但所有候选都与分组接近分离
+       - 全部候选供者级 TVD > 0.5：['institution', 'donation_type', 'source']。匹配它们在控制来源差异的同时会抹掉真实的病例/对照差异（把生物学一起匹配走），判定很可能直接是 NOT SEPARABLE
+       - 建议：改用【分层 + 供者级 TVD】作为可比性依据，而非 matched comparison（见 audit_2_recommendation）
+  ✅ audit_3_robust       可运行
+       - 2/7 个深度箱满足两组各 >= 30 细胞
+
+【审计二 · 总体建议】
+  建议做法: tvd_stratification   可行: False
+  可直接用于方法学描述的措辞：
+    “Control and case groups differed systematically in procurement/source variables (donor-level total-variation distance up to 0.83 for 'institution'); because no candidate variable could be matched without also removing the biological contrast, we report the imbalance explicitly and base comparability on the donor-level total-variation distance rather than on a matched comparison.”
+  可选策略（工具不排序，只列权衡）：
+    · [conservative] 只用推荐变量匹配（最保守）
+        配置提示: {'match_vars': []}
+        代价/取舍: 保留可定量细胞数；但无法控制 ['institution', 'donation_type', 'source'] 的混杂，须在方法学描述中把该局限写明
+    · [primary_plus_sensitivity] 主分析 + 分层/敏感性分析（平衡）
+        配置提示: {'match_vars': [], 'strata_cols': ['institution', 'donation_type', 'source']}
+        代价/取舍: 主分析用 无；对 ['institution', 'donation_type', 'source'] 分层或作为敏感性分析。兼顾混杂控制与生物学完整性，代价是需报告两组结果
+    · [no_matching] 放弃匹配，以供者级 TVD 为可比性依据
+        配置提示: {'run_matched_comparison': False}
+        代价/取舍: 承认设计共线、不做匹配；审计二以 TVD 判定，在方法学描述中显式声明该局限。**这不是'退而求其次'，当混杂是结构性的时它是最诚实的做法**
+    以上三套策略的取舍取决于你对该变量是否代表生物学差异的判断——工具不替你排序，也不写入配置。
+
+【参照表覆盖】
+  参照表共 0 个基因 · 覆盖目标面板 0/5（0.0%）
+  未覆盖 → 将报 INSUFFICIENT (no reference): ['MYL3', 'PLN', 'TNNT2', 'ACTB', 'GAPDH']
+
+【参照表溯源】⚠️ 未找到 manifest → R 可比性无法核验
+
+【深度分层容量】
+  分箱数 7 · 两组均 >= 30 细胞的箱: 2 个
+    [ ] (0,200]            对照      0 病例      0
+    [ ] (200,400]          对照      0 病例      0
+    [✓] (400,600]          对照     56 病例     71
+    [✓] (600,800]          对照     57 病例     55
+    [ ] (800,1200]         对照     37 病例     24
+    [ ] (1200,2000]        对照      0 病例      0
+    [ ] (2000,inf)         对照      0 病例      0
+
+【警告】
+  ⚠️ 未提供参照表（reference=None）→ 覆盖率 0/5 为 0 系**未传入**所致，而非参照表缺少这些基因；审计一无法计算 R，请用 --reference 传入参照表后重跑。
+  ⚠️ 未找到参照表的 manifest（门控参数登记）→ R 的跨数据集可比性无法核验
+
+【建议】
+  → 以下变量的供者级 TVD 已超 hetero_max=0.5：['institution', 'donation_type', 'source']。纳入其中任一并命中，判定将直接指向 NOT SEPARABLE —— 这通常是**正确**的信号（该变量与分组共线），但若你认为它不代表取材/来源差异，请显式记录理由。
+  → 匹配变量应是【取材/来源相关】的设计变量（机构、取材方式、分选来源、区域）。不要把结局或治疗后变量放进 match_vars —— 对结局变量匹配会引入 collider bias，使比较失去意义。本命令只做候选发现，不判断变量的方法学角色。
+
+--------------------------------------------------------------------------
+提示：本命令不写入任何配置。请自行把选定的设计变量写进 config yaml，
+      再运行 composition / run —— 这一步是审计二「事前锁定」属性的来源。
+==========================================================================

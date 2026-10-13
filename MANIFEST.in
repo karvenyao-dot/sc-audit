@@ -1,0 +1,22 @@
+# sdist 打包清单（源码分发 / 本地安装用；不影响 wheel）
+# 说明：pyproject 的 [tool.setuptools] 只声明 packages=["sc_audit"]，
+# 故 configs/*.yaml 之外的顶层文件（tests / docs / examples）需在此显式纳入 sdist。
+include LICENSE
+include README.md
+include GETTING_STARTED.md
+include DOCS_INDEX.md
+include CHANGELOG.md
+include CITATION.cff
+include pyproject.toml
+include pytest.ini
+include MANIFEST.in
+
+recursive-include sc_audit/configs *.yaml
+recursive-include docs *.md *.json
+recursive-include examples *
+recursive-include tests *.py
+
+recursive-exclude * __pycache__
+recursive-exclude * *.py[cod]
+global-exclude .DS_Store
+global-exclude *.pyc

@@ -1,0 +1,29 @@
+{
+  "_purpose": "审计二 v0.3 可识别性层的阈值契约（v0.3 层，2026-10-06 制定；0.3.3 未变）。与 AuditConfig 默认值逐字段相等。",
+  "_source": "sc_audit/config.py AuditConfig 默认值（v0.3 层；0.3.3 未变）",
+  "_derived_from": {
+    "identifiability_min_support_cells": "None → 复用 matched_min_cells_warn（单一真值源）；0 = 显式不设下限"
+  },
+  "_one_sided": {
+    "identifiability_one_sided_verdict": "True = 单侧给方向判定并强制附警示；False = 两端 INDETERMINATE（旧保守读法）"
+  },
+  "_superseded": {
+    "identifiability_require_both_strata": "v0.3.0 字段，已由 identifiability_one_sided_verdict 取代"
+  },
+  "values": {
+    "matched_min_cells_warn": 50,
+    "identifiability_min_support_cells": null,
+    "attenuation_min": 0.5,
+    "attenuation_min_full_effect_pp": 5.0,
+    "identifiability_one_sided_verdict": true,
+    "identifiability_suppress_below_floor": true,
+    "identifiability_ladder": null,
+    "identifiability_derived_prefixes": [
+      "score_"
+    ],
+    "identifiability_derived_cols": [],
+    "identifiability_nondesign_cols": [],
+    "match_var_tvd_low": 0.1,
+    "hetero_max": 0.5
+  }
+}

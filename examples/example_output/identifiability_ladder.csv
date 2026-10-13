@@ -1,0 +1,41 @@
+rule,n_donors,n_cells,gene,full_pp,matched_pp,matched_ctrl_pct,ratio
+R0 不匹配（锚点）,6,150,MYL3,3.33,3.33,3.3,1.0
+R0 不匹配（锚点）,6,150,PLN,54.0,54.0,90.0,1.0
+R0 不匹配（锚点）,6,150,TNNT2,66.67,66.67,94.7,1.0
+R0 不匹配（锚点）,6,150,ACTB,10.67,10.67,93.3,1.0
+R0 不匹配（锚点）,6,150,GAPDH,1.33,1.33,88.0,1.0
+R1 现行口径 institution∧donation_type∧source∧region,1,25,MYL3,3.33,12.0,12.0,3.6
+R1 现行口径 institution∧donation_type∧source∧region,1,25,PLN,54.0,48.0,84.0,0.89
+R1 现行口径 institution∧donation_type∧source∧region,1,25,TNNT2,66.67,72.0,100.0,1.08
+R1 现行口径 institution∧donation_type∧source∧region,1,25,ACTB,10.67,13.33,96.0,1.25
+R1 现行口径 institution∧donation_type∧source∧region,1,25,GAPDH,1.33,1.33,88.0,1.0
+R2 全部候选变量合取,1,25,MYL3,3.33,12.0,12.0,3.6
+R2 全部候选变量合取,1,25,PLN,54.0,48.0,84.0,0.89
+R2 全部候选变量合取,1,25,TNNT2,66.67,72.0,100.0,1.08
+R2 全部候选变量合取,1,25,ACTB,10.67,13.33,96.0,1.25
+R2 全部候选变量合取,1,25,GAPDH,1.33,1.33,88.0,1.0
+R3 同管线 design-defining 合取 (institution∧donation_type∧source∧region),1,25,MYL3,3.33,12.0,12.0,3.6
+R3 同管线 design-defining 合取 (institution∧donation_type∧source∧region),1,25,PLN,54.0,48.0,84.0,0.89
+R3 同管线 design-defining 合取 (institution∧donation_type∧source∧region),1,25,TNNT2,66.67,72.0,100.0,1.08
+R3 同管线 design-defining 合取 (institution∧donation_type∧source∧region),1,25,ACTB,10.67,13.33,96.0,1.25
+R3 同管线 design-defining 合取 (institution∧donation_type∧source∧region),1,25,GAPDH,1.33,1.33,88.0,1.0
+R4 单变量 institution,1,25,MYL3,3.33,12.0,12.0,3.6
+R4 单变量 institution,1,25,PLN,54.0,48.0,84.0,0.89
+R4 单变量 institution,1,25,TNNT2,66.67,72.0,100.0,1.08
+R4 单变量 institution,1,25,ACTB,10.67,13.33,96.0,1.25
+R4 单变量 institution,1,25,GAPDH,1.33,1.33,88.0,1.0
+R4 单变量 donation_type,1,25,MYL3,3.33,12.0,12.0,3.6
+R4 单变量 donation_type,1,25,PLN,54.0,48.0,84.0,0.89
+R4 单变量 donation_type,1,25,TNNT2,66.67,72.0,100.0,1.08
+R4 单变量 donation_type,1,25,ACTB,10.67,13.33,96.0,1.25
+R4 单变量 donation_type,1,25,GAPDH,1.33,1.33,88.0,1.0
+R4 单变量 source,1,25,MYL3,3.33,12.0,12.0,3.6
+R4 单变量 source,1,25,PLN,54.0,48.0,84.0,0.89
+R4 单变量 source,1,25,TNNT2,66.67,72.0,100.0,1.08
+R4 单变量 source,1,25,ACTB,10.67,13.33,96.0,1.25
+R4 单变量 source,1,25,GAPDH,1.33,1.33,88.0,1.0
+R4 单变量 region,6,150,MYL3,3.33,3.33,3.3,1.0
+R4 单变量 region,6,150,PLN,54.0,54.0,90.0,1.0
+R4 单变量 region,6,150,TNNT2,66.67,66.67,94.7,1.0
+R4 单变量 region,6,150,ACTB,10.67,10.67,93.3,1.0
+R4 单变量 region,6,150,GAPDH,1.33,1.33,88.0,1.0

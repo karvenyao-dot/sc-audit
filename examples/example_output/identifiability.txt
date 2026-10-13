@@ -1,0 +1,54 @@
+== Audit 2 (v0.3) · Identifiability & matching ladder ==
+
+cells 300 · donors 12 · control 150/6 · case 150/6
+
+-- ① variable roster (every non-QC obs column must be bucketed) --
+       column role_zh  tvd_donor  ent_case  ent_ctrl                 bucket
+  institution   取材/来源      0.833      -0.0      0.65 design-defining(scope)
+donation_type   取材/来源      0.833      -0.0      0.65 design-defining(scope)
+       source   取材/来源      0.833      -0.0      0.65 design-defining(scope)
+       region   取材/来源      0.000      -0.0     -0.00 design-defining(scope)
+    completeness: 9 columns = non-design 5 + bucketed 4 + unclassified 0
+    design-defining (constant within cases → scope statement, not matchable): ['institution', 'donation_type', 'source', 'region']
+    adjustable (varies within cases → true confounders, must be in the adjustment set): []
+
+-- ② common support (identifiability is checked BEFORE matching) --
+    case design profile(s): ['INST_A|biopsy|Cells|heart']
+    control donors inside that profile: ['ctrl_d0'] → 25 cells (of 6 control donors)
+    donor-level positivity overlap: case 1.0 · ctrl 0.167 · min 0.167 (A2；低于 positivity_overlap_min 阈值 → 强制警示，不覆盖阶梯判定)
+
+-- ③ prespecified matching ladder --
+                                                               rule  n_donors  n_cells  n_usable  n_amplified  median_ratio
+                                                         R0 不匹配（锚点）         6      150         3            0          1.00
+                    R1 现行口径 institution∧donation_type∧source∧region         1       25         3            2          1.08
+                                                        R2 全部候选变量合取         1       25         3            2          1.08
+R3 同管线 design-defining 合取 (institution∧donation_type∧source∧region)         1       25         3            2          1.08
+                                                 R4 单变量 institution         1       25         3            2          1.08
+                                               R4 单变量 donation_type         1       25         3            2          1.08
+                                                      R4 单变量 source         1       25         3            2          1.08
+                                                      R4 单变量 region         6      150         3            0          1.00
+
+attenuation ratio (matched / full effect), rules × genes (R0 = anchor, ratio ≡ 1 by definition):
+gene                                                                 ACTB  GAPDH  MYL3   PLN  TNNT2
+rule                                                                                               
+R0 不匹配（锚点）                                                           1.00    1.0   1.0  1.00   1.00
+R1 现行口径 institution∧donation_type∧source∧region                      1.25    1.0   3.6  0.89   1.08
+R2 全部候选变量合取                                                          1.25    1.0   3.6  0.89   1.08
+R3 同管线 design-defining 合取 (institution∧donation_type∧source∧region)  1.25    1.0   3.6  0.89   1.08
+R4 单变量 donation_type                                                 1.25    1.0   3.6  0.89   1.08
+R4 单变量 institution                                                   1.25    1.0   3.6  0.89   1.08
+R4 单变量 region                                                        1.00    1.0   1.0  1.00   1.00
+R4 单变量 source                                                        1.25    1.0   3.6  0.89   1.08
+
+-- ④ verdict --
+    pre-specified floor: support cells >= 50 (from matched_min_cells_warn)
+    observed support cells = 25
+    ladder medians: 1.080, 1.080, 1.080, 1.080, 1.080, 1.080, 1.000 (median 1.080, spread 0.080)
+    below attenuation_min=0.5: 0 rule(s); at/above: 7 rule(s)
+    VERDICT: SUPPORT-BELOW-FLOOR — design not identifiable (common support 25 cells < pre-specified floor 50, and the case group is constant on institution/donation_type/source/region)
+    * attenuation ratios are SUPPRESSED: any matched subset is decided by too few donors to constitute evidence of the confounding share.
+  · no adjusted between-group estimate exists: matching on a variable that is constant within cases conditions on the very contrast being estimated. The deliverable is the design table above plus a scope statement.
+  · attenuation ratios are NOT reported as evidence: they range 1.000–1.080 across the ladder and every matched subset is decided by ≤ 6 donor(s).
+  · POSITIVITY-OVERLAP CAVEAT (mandatory): donor-level covariate overlap is insufficient (case 1.0 / control 0.167; min < positivity_overlap_min=0.5). The ladder estimate is defined only on the (possibly small) common-support population; the overall case-vs-control contrast violates positivity and is NOT identified for the full population (Petersen 2012, PMID 21030422). Cell counts are a CAPACITY prerequisite, not the identifiability criterion.
+  · chance-constancy risk: with only 6 case donor(s), a design variable can be constant within cases by sampling alone (institution: P=0.335 (pooled share 0.58; control-arm share 0.17); donation_type: P=0.335 (pooled share 0.58; control-arm share 0.17); source: P=0.335 (pooled share 0.58; control-arm share 0.17)); the reference prevalences are taken from the pooled donor pool and from the control arm, not from the case group (whose share is 1 by construction). 'design-defining' is a property of this dataset, not proof of population-level constancy.
+  · for comparison, the original single-rule convention (R1) uses 1 donor(s) / 25 cell(s) and yields a median attenuation of 1.080 — v0.2 would have reported that number as the confounding share.

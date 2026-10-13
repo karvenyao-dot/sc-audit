@@ -1,0 +1,239 @@
+{
+  "schema": "sc-audit/readiness/1",
+  "input": {
+    "n_cells": 300,
+    "n_genes": 22,
+    "counts_source": "X",
+    "counts_ok": true,
+    "gene_lookup": {
+      "resolved": {
+        "MYL3": "MYL3",
+        "PLN": "PLN",
+        "TNNT2": "TNNT2",
+        "ACTB": "ACTB",
+        "GAPDH": "GAPDH"
+      },
+      "missing": []
+    },
+    "gating": null
+  },
+  "groups": {
+    "obs_ok": true,
+    "condition_levels": [
+      "control",
+      "disease"
+    ],
+    "case_scope": "single level",
+    "control_label": "control",
+    "case_label": "disease",
+    "n_control_cells": 150,
+    "n_case_cells": 150,
+    "n_donors_ctrl": 6,
+    "n_donors_case": 6
+  },
+  "design_variables": [
+    {
+      "column": "institution",
+      "n_levels": 2,
+      "role": "design",
+      "role_zh": "取材/来源",
+      "role_reasons": [
+        "列名含「institution」词根 → 角色：取材/来源",
+        "仅在单一组内变化（对照 2 个水平 / 病例 1 个水平）→ 既可能是结局/条件依赖变量，也可能只是分组不平衡的取材变量，数据上无法区分，需人工甄别"
+      ],
+      "condition_dependent": true,
+      "recommendation": "risky",
+      "reasoning": "供者级 TVD=0.833 > hetero_max=0.5：与分组接近分离 → 若纳入并命中，判定将直接指向 NOT SEPARABLE。匹配它会在控制来源差异的同时抹掉真实的病例/对照差异（把生物学一起匹配走）",
+      "tvd_donor": 0.833,
+      "tvd_cell": 0.833,
+      "cramers_v": 0.845,
+      "entropy_bits": 0.98,
+      "donor_unique": false,
+      "status": "可用·需注意",
+      "reason": "供者级 TVD=0.833 > hetero_max=0.5：与分组接近分离 → 若纳入并命中，判定将直接指向 NOT SEPARABLE。匹配它会在控制来源差异的同时抹掉真实的病例/对照差异（把生物学一起匹配走）"
+    },
+    {
+      "column": "donation_type",
+      "n_levels": 2,
+      "role": "design",
+      "role_zh": "取材/来源",
+      "role_reasons": [
+        "列名含「donation」词根 → 角色：取材/来源",
+        "仅在单一组内变化（对照 2 个水平 / 病例 1 个水平）→ 既可能是结局/条件依赖变量，也可能只是分组不平衡的取材变量，数据上无法区分，需人工甄别"
+      ],
+      "condition_dependent": true,
+      "recommendation": "risky",
+      "reasoning": "供者级 TVD=0.833 > hetero_max=0.5：与分组接近分离 → 若纳入并命中，判定将直接指向 NOT SEPARABLE。匹配它会在控制来源差异的同时抹掉真实的病例/对照差异（把生物学一起匹配走）",
+      "tvd_donor": 0.833,
+      "tvd_cell": 0.833,
+      "cramers_v": 0.845,
+      "entropy_bits": 0.98,
+      "donor_unique": false,
+      "status": "可用·需注意",
+      "reason": "供者级 TVD=0.833 > hetero_max=0.5：与分组接近分离 → 若纳入并命中，判定将直接指向 NOT SEPARABLE。匹配它会在控制来源差异的同时抹掉真实的病例/对照差异（把生物学一起匹配走）"
+    },
+    {
+      "column": "source",
+      "n_levels": 2,
+      "role": "design",
+      "role_zh": "取材/来源",
+      "role_reasons": [
+        "列名含「source」词根 → 角色：取材/来源",
+        "仅在单一组内变化（对照 2 个水平 / 病例 1 个水平）→ 既可能是结局/条件依赖变量，也可能只是分组不平衡的取材变量，数据上无法区分，需人工甄别"
+      ],
+      "condition_dependent": true,
+      "recommendation": "risky",
+      "reasoning": "供者级 TVD=0.833 > hetero_max=0.5：与分组接近分离 → 若纳入并命中，判定将直接指向 NOT SEPARABLE。匹配它会在控制来源差异的同时抹掉真实的病例/对照差异（把生物学一起匹配走）",
+      "tvd_donor": 0.833,
+      "tvd_cell": 0.833,
+      "cramers_v": 0.845,
+      "entropy_bits": 0.98,
+      "donor_unique": false,
+      "status": "可用·需注意",
+      "reason": "供者级 TVD=0.833 > hetero_max=0.5：与分组接近分离 → 若纳入并命中，判定将直接指向 NOT SEPARABLE。匹配它会在控制来源差异的同时抹掉真实的病例/对照差异（把生物学一起匹配走）"
+    }
+  ],
+  "suspect_design_variables": [],
+  "feasibility": {
+    "audit_1_floor": {
+      "level": "ok",
+      "status": "可运行",
+      "notes": [
+        "未提供 --reference → R 无法计算，多数基因将判 INSUFFICIENT (no reference)"
+      ]
+    },
+    "audit_2_composition": {
+      "level": "degraded",
+      "status": "可运行，但所有候选都与分组接近分离",
+      "notes": [
+        "全部候选供者级 TVD > 0.5：['institution', 'donation_type', 'source']。匹配它们在控制来源差异的同时会抹掉真实的病例/对照差异（把生物学一起匹配走），判定很可能直接是 NOT SEPARABLE",
+        "建议：改用【分层 + 供者级 TVD】作为可比性依据，而非 matched comparison（见 audit_2_recommendation）"
+      ]
+    },
+    "audit_3_robust": {
+      "level": "ok",
+      "status": "可运行",
+      "notes": [
+        "2/7 个深度箱满足两组各 >= 30 细胞"
+      ]
+    }
+  },
+  "audit_2_recommendation": {
+    "method": "tvd_stratification",
+    "feasible": false,
+    "recommended_variables": [],
+    "statement_for_paper": "Control and case groups differed systematically in procurement/source variables (donor-level total-variation distance up to 0.83 for 'institution'); because no candidate variable could be matched without also removing the biological contrast, we report the imbalance explicitly and base comparability on the donor-level total-variation distance rather than on a matched comparison.",
+    "excluded_by_role": [],
+    "excluded_as_unusable": [],
+    "needs_manual_review": [],
+    "options": [
+      {
+        "id": "conservative",
+        "label": "只用推荐变量匹配（最保守）",
+        "config_hint": {
+          "match_vars": []
+        },
+        "trade_off": "保留可定量细胞数；但无法控制 ['institution', 'donation_type', 'source'] 的混杂，须在方法学描述中把该局限写明"
+      },
+      {
+        "id": "primary_plus_sensitivity",
+        "label": "主分析 + 分层/敏感性分析（平衡）",
+        "config_hint": {
+          "match_vars": [],
+          "strata_cols": [
+            "institution",
+            "donation_type",
+            "source"
+          ]
+        },
+        "trade_off": "主分析用 无；对 ['institution', 'donation_type', 'source'] 分层或作为敏感性分析。兼顾混杂控制与生物学完整性，代价是需报告两组结果"
+      },
+      {
+        "id": "no_matching",
+        "label": "放弃匹配，以供者级 TVD 为可比性依据",
+        "config_hint": {
+          "run_matched_comparison": false
+        },
+        "trade_off": "承认设计共线、不做匹配；审计二以 TVD 判定，在方法学描述中显式声明该局限。**这不是'退而求其次'，当混杂是结构性的时它是最诚实的做法**"
+      }
+    ],
+    "options_note": "以上三套策略的取舍取决于你对该变量是否代表生物学差异的判断——工具不替你排序，也不写入配置。"
+  },
+  "depth_bins": {
+    "n_bins": 7,
+    "min_cells_per_stratum": 30,
+    "n_bins_ok": 2,
+    "bins": [
+      {
+        "range": "(0,200]",
+        "n_ctrl": 0,
+        "n_case": 0,
+        "ok": false
+      },
+      {
+        "range": "(200,400]",
+        "n_ctrl": 0,
+        "n_case": 0,
+        "ok": false
+      },
+      {
+        "range": "(400,600]",
+        "n_ctrl": 56,
+        "n_case": 71,
+        "ok": true
+      },
+      {
+        "range": "(600,800]",
+        "n_ctrl": 57,
+        "n_case": 55,
+        "ok": true
+      },
+      {
+        "range": "(800,1200]",
+        "n_ctrl": 37,
+        "n_case": 24,
+        "ok": false
+      },
+      {
+        "range": "(1200,2000]",
+        "n_ctrl": 0,
+        "n_case": 0,
+        "ok": false
+      },
+      {
+        "range": "(2000,inf)",
+        "n_ctrl": 0,
+        "n_case": 0,
+        "ok": false
+      }
+    ]
+  },
+  "reference_coverage": {
+    "n_reference_genes": 0,
+    "n_target_genes": 5,
+    "target_covered": [],
+    "target_missing": [
+      "MYL3",
+      "PLN",
+      "TNNT2",
+      "ACTB",
+      "GAPDH"
+    ],
+    "pct_target_covered": 0.0,
+    "note": "只有被参照表覆盖的基因才能得到基于 R 的判定；未覆盖者将报 INSUFFICIENT (no reference)。分母应是目标基因面板，而非数据集全部基因。"
+  },
+  "reference_provenance": {
+    "manifest_found": false
+  },
+  "blockers": [],
+  "warnings": [
+    "未提供参照表（reference=None）→ 覆盖率 0/5 为 0 系**未传入**所致，而非参照表缺少这些基因；审计一无法计算 R，请用 --reference 传入参照表后重跑。",
+    "未找到参照表的 manifest（门控参数登记）→ R 的跨数据集可比性无法核验"
+  ],
+  "recommendations": [
+    "以下变量的供者级 TVD 已超 hetero_max=0.5：['institution', 'donation_type', 'source']。纳入其中任一并命中，判定将直接指向 NOT SEPARABLE —— 这通常是**正确**的信号（该变量与分组共线），但若你认为它不代表取材/来源差异，请显式记录理由。",
+    "匹配变量应是【取材/来源相关】的设计变量（机构、取材方式、分选来源、区域）。不要把结局或治疗后变量放进 match_vars —— 对结局变量匹配会引入 collider bias，使比较失去意义。本命令只做候选发现，不判断变量的方法学角色。"
+  ],
+  "reference_genes": 0,
+  "note": "This command only REPORTS. It never writes to the config. Choose your match variables yourself and write them into the config yaml before running composition/run — that is what keeps the audit pre-registered."
+}

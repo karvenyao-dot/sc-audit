@@ -1,0 +1,40 @@
+== Audit 3 · Robust-signal control ==
+
+-- depth comparability --
+_g                          case      control
+n                     150.000000   150.000000
+n_genes_median        623.000000   679.500000
+total_counts_median  3007.500000  3001.500000
+percent_mito_median    12.223631    12.138856
+
+depth verdict   : DEPTH-COMPARABLE (genes_per_cell=-8.3%, counts_per_cell=+0.2%)
+
+-- depth-stratified detection: MYL3 --
+  stratum  ctrl_pct  n_ctrl  case_pct  n_case  delta_pp  ci_disjoint
+(400,600]       3.6      56       0.0      71       3.6        False
+(600,800]       5.1      59       0.0      55       5.1        False
+
+-- depth-stratified detection: PLN --
+  stratum  ctrl_pct  n_ctrl  case_pct  n_case  delta_pp  ci_disjoint
+(400,600]      89.3      56      36.6      71      52.7         True
+(600,800]      91.5      59      40.0      55      51.5         True
+
+-- depth-stratified detection: TNNT2 --
+  stratum  ctrl_pct  n_ctrl  case_pct  n_case  delta_pp  ci_disjoint
+(400,600]      94.6      56      31.0      71      63.7         True
+(600,800]      93.2      59      23.6      55      69.6         True
+
+-- depth-stratified detection: ACTB --
+  stratum  ctrl_pct  n_ctrl  case_pct  n_case  delta_pp  ci_disjoint
+(400,600]      89.3      56      81.7      71       7.6        False
+(600,800]      93.2      59      83.6      55       9.6        False
+
+-- depth-stratified detection: GAPDH --
+  stratum  ctrl_pct  n_ctrl  case_pct  n_case  delta_pp  ci_disjoint
+(400,600]      91.1      56      85.9      71       5.2        False
+(600,800]      84.7      59      89.1      55      -4.3        False
+
+VERDICT: DEPTH-COMPARABLE — separation persists (direction-consistent, magnitude >= 5.0 pp, CI-disjoint in >= 60% of strata) for 2/5 gene(s) tested [PLN: 2/2 strata CI-disjoint, TNNT2: 2/2 strata CI-disjoint]
+  · ACTB excluded from the persistence count (housekeeping / positive control)
+  · GAPDH excluded from the persistence count (housekeeping / positive control)
+  · depth-stratification metric sensitivity: n_genes and total_counts strata give the SAME persistence verdict.

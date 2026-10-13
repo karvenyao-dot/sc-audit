@@ -1,0 +1,5 @@
+column,role,role_zh,tvd_donor,ent_case,ent_ctrl,donor_unique,all_missing,levels,bucket
+institution,design,取材/来源,0.833,-0.0,0.65,False,False,2,design-defining(scope)
+donation_type,design,取材/来源,0.833,-0.0,0.65,False,False,2,design-defining(scope)
+source,design,取材/来源,0.833,-0.0,0.65,False,False,2,design-defining(scope)
+region,design,取材/来源,0.0,-0.0,-0.0,False,False,1,design-defining(scope)

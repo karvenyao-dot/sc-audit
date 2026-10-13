@@ -1,0 +1,9 @@
+rule,n_donors,n_cells,n_usable,n_amplified,median_ratio
+R0 不匹配（锚点）,6,150,3,0,1.0
+R1 现行口径 institution∧donation_type∧source∧region,1,25,3,2,1.08
+R2 全部候选变量合取,1,25,3,2,1.08
+R3 同管线 design-defining 合取 (institution∧donation_type∧source∧region),1,25,3,2,1.08
+R4 单变量 institution,1,25,3,2,1.08
+R4 单变量 donation_type,1,25,3,2,1.08
+R4 单变量 source,1,25,3,2,1.08
+R4 单变量 region,6,150,3,0,1.0

@@ -1,0 +1,140 @@
+# sc-audit preset — cardiac
+#
+# N3 修复：本文件与 AuditConfig() 的默认值**逐字段一致**（v0.3.3 补齐 fdr_alpha 与
+# audit-4 的 identity_* 共 14 个字段；此前 52/66，靠注释声称“逐字段一致”是错的）。
+# v0.4.0 再补 9 个设计声明字段（design_*）；v0.5.0 补参照契约字段（allow_cross_modality）；
+# 测试仍强制**全字段**一致。
+# 原版本回退了 min_cells_per_stratum（5 vs 默认 30）且缺少新增字段，
+# 导致用 `--config cardiac` 时会静默回到旧行为。
+# 测试 test_yaml_preset_matches_defaults_for_locked_thresholds 会强制二者**全字段**一致。
+
+# ════════ 审计一：检出地板 ════════
+floor_pct: 5.0            # pct_case < 5% → 不可定量
+ratio_min: 0.3            # R < 0.3 → dropout-limited
+ratio_ok: 0.6             # R >= 0.6 且 pct >= pct_ok → 可定量
+pct_ok: 20.0
+ratio_basis: case         # R 与判定共用此分子口径（case/overall/control）
+
+# ════════ 事件数分层（事前锁定）════════
+event_sparse: 20          # n_pos < 20 → 仅描述性统计，不做显著性检验
+event_limited: 50         # 20 <= n_pos < 50 → 附精确 CI 与 jackknife 范围
+event_sparse_grid: [10, 20, 50]   # 阈值敏感性（仅报告，不改主判定）
+
+# ════════ 置换检验 ════════
+n_perm: 10000
+seeds: [42]
+exact_enum_max_units: 40          # 单位数上限（病态保护）
+exact_max_combinations: 5000000   # 组合数 <= 此值 → 精确枚举（消除种子依赖）
+
+# ════════ 多重比较 ════════
+fdr_method: bh
+fdr_alpha: 0.05                   # BH 的 alpha（与 fdr_method 一起事前锁定）
+fdr_exclude_from_m: [ACTB, GAPDH] # 阳性对照不参与假设集合 m
+
+# ════════ 细胞门控（阈值从本文件读取；preset 只决定 marker 面板）════════
+min_counts: 500
+min_genes: 200
+min_pos_markers: 2
+pos_markers: [TTN, MYH7, MYBPC3, ACTN2, TNNI3, MYL2]
+neg_markers: [PTPRC, CD3E, DCN, COL1A1, PECAM1, VWF, LYZ]
+
+# ════════ 深度分层 ════════
+depth_edges: [0, 200, 400, 600, 800, 1200, 2000, 100000]
+min_cells_per_stratum: 30         # 每箱每组的**最小细胞数**（原 5 无统计意义）
+
+# ════════ 审计二：对照构成 ════════
+strata_cols: [institution, donation_type, source, region, batch, lane, library]
+match_vars: [institution, donation_type, source, region]
+auto_filter_stratum_cols: true    # 自动剔除样本/供者级唯一的列
+
+# ── 变量角色声明（优先级高于启发式；check 用）──
+# 列名不含常见词根时，在此显式声明结局/治疗变量，避免被误选进 match_vars：
+#   role_overrides: {outcome_90d: outcome, treatment_flag: treatment}
+role_overrides: {}
+extra_outcome_keywords: []        # 领域特定结局词根（追加到内置词根表）
+extra_treatment_keywords: []      # 领域特定治疗词根
+forbid_outcome_matching: true     # match_vars 命中结局/治疗变量 → 中止（防 collider bias）
+# 是否执行"匹配供者"分析（false = check 的策略 3：只报供者级 TVD）
+run_matched_comparison: true
+
+hetero_col: institution
+hetero_max: 0.5                   # 供者级 TVD > 此值 → NOT SEPARABLE
+match_var_tvd_low: 0.1            # 【仅 check 排序建议】TVD 低于此值 → 与分组近乎独立
+attenuation_min: 0.5
+attenuation_min_full_effect_pp: 5.0
+matched_min_cells_warn: 50
+
+# ════════ 审计二 · v0.3 可识别性层（2026-10-06 并入）════════
+# 事前锁定的匹配规则阶梯；null → 内置阶梯 R0–R5
+identifiability_ladder: null
+# 共同支持域下限；null → 复用 matched_min_cells_warn（单一真值源）
+identifiability_min_support_cells: null
+# 保护①：单侧情形直接给方向判定（NOT SEPARABLE/COMPARABLE）+ 强制警示；
+#        两档并存（阈值落在观测区间内）→ THRESHOLD-SPANNING。false = 两端均 INDETERMINATE
+identifiability_one_sided_verdict: true
+# 低于支持域下限 → 抑制衰减比数字
+identifiability_suppress_below_floor: true
+# 非设计列（细胞级 QC / 分组 / 供者 / 身份注释）与表达派生评分列
+identifiability_nondesign_cols: []
+identifiability_derived_cols: []
+identifiability_derived_prefixes: [score_]
+# 共同支持域下限：null → 复用 matched_min_cells_warn（单一真值源）；0 = 不设下限
+
+# ════════ 审计三：稳健信号 ════════
+depth_delta_max_pct: 20.0         # |Δ genes/counts| >= 此值 → PARTIAL
+strat_min_delta_pp: 5.0
+strat_ci_level: 0.95
+strat_ci_frac_ok: 0.6             # CI 不重叠的箱比例达标才算"分离持续"
+housekeeping_ratio_ok: 0.6
+mito_delta_warn_pp: 5.0           # mito 差异（pp）→ 独立 CELL-STATE DIFFERS 档
+
+# ════════ 原始计数校验（B5/N6）════════
+count_layer: null                 # 指定存放计数的 layer（null = 自动探测）
+require_integer_counts: true
+recompute_qc_after_source_switch: true
+
+# ════════ 设计声明（v0.4.0 · Tier 1）════════
+# 只记录、不推断；默认值 = 支持集 S0（二元、横断面、单位=供者）。
+# 不声明 = 与 v0.3.x 行为一致；声明超出 S0 → 能力闸门拒绝出判定
+# （DESIGN-NOT-SUPPORTED，exit 3；见 sc_audit/design.py 与 docs/methods.md）。
+design_comparison_type: two_arm    # two_arm|paired|time_course|multi_arm|multi_state
+design_unit: donor                 # donor|donor_timepoint|sample|cell
+design_contrast_a: null            # 比较的 A 组标签（null = 由 condition/control 推）
+design_contrast_b: null
+design_time_col: null              # 纵向时间列（未实现，声明即拒绝）
+design_ref_time: null
+design_index_time: null            # 索引时间（仅记录）
+design_index_event: null           # 索引事件（仅记录）
+design_strata: []                  # 分层/匹配变量的显式声明（可选）
+
+# ════════ 报告 ════════
+housekeeping_genes: [ACTB, GAPDH]
+
+# ════════ v0.6.0 方法学修订（A/B/C；事前锁定）════════
+reference_depth_delta_max_pct: 50.0   # A1 case↔参照 深度相对差 > 此值 → 默认拒绝
+allow_depth_mismatch: false           # 显式放行深度不匹配
+positivity_overlap_min: 0.5           # A2 供者级协变量重叠下限 → NOT SEPARABLE
+housekeeping_cv_warn: 0.5             # B2 各管家 R 的 CV 超此值 → 告警
+housekeeping_high_baseline: 0.8       # L1 管家高基线阈值（适用域声明）
+latent_batch_ari_warn: 0.5            # B1 条件×供者技术簇 ARI 超此值 → 报警
+
+# ════════ 参照契约（v0.5.0；REFERENCE_SCHEMA R1/R2）════════
+# R2 跨 modality 默认禁止；true = 显式放行（CLI --allow-cross-modality）
+allow_cross_modality: false
+
+# ════════ 审计四：细胞身份与捕获完整性 ════════
+identity_col: lineage_names            # 细胞类型/谱系注释列
+identity_target: ""                  # 空 = 自动选（最大谱系）
+identity_source_col: source            # 取材/分选来源列
+identity_imbalance_min_cells: 20       # 亚群不平衡判据的最小细胞数
+identity_imbalance_min_tvd: 0.5        # 臂间亚群构成的 TVD 阈值
+identity_collinear_min_delta_pp: 10.0  # “门控/亚群与分组共线”的 pp 阈值
+identity_gate_pass_floor_pct: 1.0      # C4: 门控通过率绝对下限(%)（低于此=门控近乎失效）
+identity_gate_arm_delta_max: 2.0       # C4: 门控通过率臂间比上限（max/min）
+identity_gate_margin: 5.0              # 门控判定与阈值的最小边距（保真度检查）
+identity_bin_min_cells: 15             # 复杂度分箱的最小细胞数
+identity_complexity_col: n_genes       # 复杂度指标列
+identity_complexity_bins: [200, 400, 600, 800, 1200]
+identity_nuclear_marker: MALAT1        # 核标志（捕获完整性）
+identity_long_genes: [RYR2, TTN, CACNA1C, KCNQ1, SCN5A]   # 长基因（回收偏倚对照）
+identity_procurement_markers: [PECAM1, VWF, DCN, COL1A1]  # 取材/分选相关标志

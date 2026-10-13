@@ -1,0 +1,4 @@
+== Audit 4 · Cell identity and capture completeness ==
+
+VERDICT: INDETERMINATE (no cell-type annotation column)
+  note: obs 中无 'lineage_names'；审计四无法执行。设 cfg.identity_col 指向注释列，或改用可门控方案（见 gating.py）。
